@@ -31,10 +31,28 @@ class FileStorage:
 
     @staticmethod
     def get_class(class_name):
-        """"class method return BaseModel"""
         if class_name == "BaseModel":
             from models.base_model import BaseModel
             return BaseModel
+        elif class_name == "User":
+            from models.user import User
+            return User
+        elif class_name == "Amenity":
+            from models.amenity import Amenity 
+            return Amenity
+        elif class_name == "City":
+            from models.city import City
+            return City 
+        elif class_name == "Place":
+            from models.place import Place
+            return Place
+        elif class_name == "Review":
+            from models.review import Review
+            return Review
+        elif class_name == "State":
+            from models.state import State
+            return State
+
 
     def reload(self):
         """reload the opening json file and get data"""

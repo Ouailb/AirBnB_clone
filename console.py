@@ -4,15 +4,31 @@ import models
 from models import storage
 from datetime import datetime
 from models.base_model import BaseModel
+from models.user import User
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+
 """"this script uses the cmd module to create a basic shell like simple shell project"""
 class HBNBCommand(cmd.Cmd):
     intro = 'Muchi muchi\n'
     prompt = '(hbnb) '
 
+
+   
+    def default(self, line):
+        print ('default(%s)' % line)
+        return cmd.Cmd.default(self, line)
     def do_quit(self, args):
         """Exit the program"""
         return True
 
+    def emptyline(self):
+        """last cmd"""
+        pass
+    
     def do_EOF(self, args):
         """Exit the program when EOF (Ctrl+D) is entered"""
         return True
@@ -20,6 +36,11 @@ class HBNBCommand(cmd.Cmd):
     def do_help(self, arg):
         """Show help message for a specific command or list available commands"""
         super().do_help(arg)
+    
+    
+
+
+
 
     def do_create(self, args):
         """Create a new instance of BaseModel, save it, and print its id"""
@@ -32,6 +53,7 @@ class HBNBCommand(cmd.Cmd):
             obj_class = globals()[class_name]
             obj = obj_class()
             obj.save()
+            # print(globals())
             print(obj.id)
         else:
             print("** class doesn't exist **")
