@@ -257,28 +257,39 @@ class HBNBCommand(cmd.Cmd):
         print(objs)
      
 
+    #  args = args.replace('"','')
+    #     print(args)
+    #     splitter = re.split(r" ", args)
+    #     if len(splitter) == 2:
+    #         class_name, part2 = splitter
+    #     print(class_name)
+    #     att = part2.split(',')
+    #     print(att[0],att[1],att[2])
 
     def do_update(self, args):
         """Update an instance based on class name and id"""
         if not args:
             print("** class name missing **")
             return
-
+        args = args.replace('"','')
         try:
-            args_list = args.split()
-            class_name = args_list[0]
-
-            if len(args_list) > 1:
-                obj_id = args_list[1]
-
-                if len(args_list) > 2:
+            splitter = re.split(r" ", args)
+            class_name, arg = splitter
+            # print(class_name)
+            attr = arg.split(',')
+            if len(arg) > 1:
+                obj_id = attr[0]
+                # print(obj_id)
+               
+                if len(arg) > 2:
                     key = f"{class_name}.{obj_id}"
+                    # print(key)
                     if key in storage.all():
                         obj = storage.all()[key]
-                        attribute = args_list[2]
+                        attribute = attr[1]
 
-                        if len(args_list) > 3:
-                            value = args_list[3]
+                        if len(arg) > 3:
+                            value = attr[2]
                             try:
                                 value = eval(value)
                             except (NameError, SyntaxError):
@@ -291,7 +302,6 @@ class HBNBCommand(cmd.Cmd):
                             return
                     else:
                         print("** no instance found **")
-                        return
                 else:
                     print("** attribute name missing **")
                     return
@@ -299,6 +309,54 @@ class HBNBCommand(cmd.Cmd):
                 print("** instance id missing **")
         except Exception as e:
             print("** class doesn't exist **")
+
+
+
+    # def do_update(self, args):
+    #     """Update an instance based on class name and id"""
+    #     print(args)
+    #     args = args.replace('"','')
+    #     print(args)
+    #     if not args:
+    #         print("** class name missing **")
+    #         return
+
+    #     try:
+    #         args_list = args.split()
+    #         class_name = args_list[0]
+
+    #         if len(args_list) > 1:
+    #             obj_id = args_list[1]
+
+    #             if len(args_list) < 3 :
+    #                 key = f"{class_name}.{obj_id}"
+    #                 print(key)
+    #                 if key in storage.all():
+    #                     obj = storage.all()[key]
+    #                     attribute = args_list[2]
+
+    #                     if len(args_list) > 3:
+    #                         value = args_list[3]
+    #                         try:
+    #                             value = eval(value)
+    #                         except (NameError, SyntaxError):
+    #                             pass
+
+    #                         setattr(obj, attribute, value)
+    #                         obj.save()
+    #                     else:
+    #                         print("** value missing **")
+    #                         return
+    #                 else:
+    #                     print("** no instance found **")
+    #                     return
+    #             else:
+    #                 print("** attribute name missing **")
+    #                 return
+    #         else:
+    #             print("** instance id missing **")
+    #     except Exception as e:
+    #         print("** class doesn't exist **")
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
