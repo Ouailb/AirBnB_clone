@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import cmd
 import models
+import re
 from models import storage
 from datetime import datetime
 from models.base_model import BaseModel
@@ -25,44 +26,101 @@ class HBNBCommand(cmd.Cmd):
             'count':self.do_count,
             'destroy': self.do_destroy,
             'update': self.do_update,
-            'quit': self.do_quit,
-            'EOF': self.do_EOF,
-            'help': self.do_help
         }
 
+    def default(self, args):
+        if args:
+            splitter = re.split(r"\.", args)
+            if len(splitter) == 2:
+                class_name, part2 = splitter
+                # print("class:", class_name)
+            
+                command = part2.split("(")[0]
+                # print(command)
+                # Extract text between parentheses and remove quotes
+                match = re.search(r'\((["\'])(.*?)\1\)', part2)
+                if match:
+                    id = match.group(2)
+                    # id = str(id)
+                    # print("id :", id)
 
-    def default(self, line):
-        try:
-            parts = line.split(".")
-            if len(parts) == 2:
-                class_name, method = parts
-                if method.endswith("()"):
-                    method = method[:-2]
-                class_obj = self.command_mapping.get(method)
-                if class_obj and callable(class_obj):
-                    result = class_obj(class_name)
-                    if result is not None:
-                        print(result)
+                    if command in self.command_mapping:
+                        self.command_mapping[command](f"{class_name} {id}")
+                        # print(result)
+                    else:
+                        print(f"** Method '{command}' doesn't exist in class '{class_name}' **")
                 else:
-                    print(f"** Method '{method}' doesn't exist in class '{class_name}' **")
+                    class_obj = self.command_mapping.get(command)
+                    if class_obj and callable(class_obj):
+                        result = class_obj(class_name)
+                        if result is not None:
+                            print(result)
             else:
-                print("** class name and method missing **")
-        except Exception as e:
-            print(f"Error: {e}")
-    # def do_all(self, args):
-    #     """Print string representations of all instances, or all instances of a specific class"""
-    #     args_list = args.split()
-    #     if args_list:
-    #         class_name = args_list[0]
-    #         if class_name in self.class_names:
-    #             objs = [str(obj) for obj in storage.all().values() if isinstance(obj, self.class_names[class_name])]
-    #             print(objs)
-    #         else:
-    #             print(f"** Class '{class_name}' doesn't exist **")
-    #     else:
-    #         objs = [str(obj) for obj in storage.all().values()]
-    #         print(objs)
+                print("Invalid format. There should be exactly one dot in the input string.")
+        else:
+            print("Nothing")
 
+    
+    # def default(self, args):
+    #     if args:
+    #         splitter = re.split(r"\.", args)
+    #         if len(splitter) == 2:
+    #             class_name, part2 = splitter
+    #             print("class:", class_name)
+            
+    #             command = part2.split("(")[0]
+    #             print(command)
+    #             # Extract text between parentheses and remove quotes
+    #             match = re.search(r'\((["\'])(.*?)\1\)', part2)
+    #             if match:
+    #                 id = match.group(2)
+    #                 id = str(id)
+    #                 print("Text between parentheses:",id)
+     
+    #                 if command in self.command_mapping:
+    #                   # Call the corresponding function
+    #                     result = self.command_mapping[command](class_name.id)
+    #                     print(result)
+    #                 else:
+    #                     print(f"** Method '{command}' doesn't exist in class '{class_name}' **")
+
+    #             else:
+    #                 class_obj = self.command_mapping.get(command)
+    #                 if class_obj and callable(class_obj):
+    #                     result = class_obj(class_name)
+    #                     if result is not None:
+    #                         print(result)
+    #                 else:
+    #                     print(f"** Method '{command}' doesn't exist in class '{class_name}' **")
+    #         else:
+    #             print("Invalid format. There should be exactly one dot in the input string.")
+    #     else:
+    #         print("Nothing")
+
+
+
+
+
+    # def default(self, args):
+    #     if args:
+    #         splitter = re.split(r"\.", args)
+    #         if len(splitter) == 2:
+    #             part1, part2 = splitter
+    #             print("class:", part1)
+    #             print("Second Part:", part2)
+    #             print("command",part2.split("(")[0])
+    #             # Extract text between parentheses and remove quotes
+    #             match = re.search(r'\((["\'])(.*?)\1\)', part2)
+    #             if match:
+    #                 id = match.group(2)
+    #                 print("Text between parentheses:",id)
+
+    #             else:
+    #                 print("No text between parentheses found.")
+    #         else:
+    #             print("Invalid format. There should be exactly one dot in the input string.")
+    #     else:
+    #         print("Nothing")
 
 
     def do_quit(self, args):
@@ -130,6 +188,8 @@ class HBNBCommand(cmd.Cmd):
 
         args_list = args.split()
         class_name = args_list[0]
+        # print(args_list)
+        # print(class_name)
 
         if len(args_list) > 1:
             obj_id = args_list[1]
