@@ -53,7 +53,14 @@ class FileStorage:
             from models.state import State
             return State
 
-
+    @classmethod
+    def count(cls, class_name):
+        """Count the number of instances of a specific class."""
+        count = 0
+        for key in cls.__objects:
+            if key.startswith(class_name + "."):
+                count += 1
+        return count
     def reload(self):
         """reload the opening json file and get data"""
         try:

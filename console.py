@@ -16,11 +16,55 @@ class HBNBCommand(cmd.Cmd):
     intro = 'Muchi muchi\n'
     prompt = '(hbnb) '
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.command_mapping = {
+            'all': self.do_all,
+            'create': self.do_create,
+            'show': self.do_show,
+            'count':self.do_count,
+            'destroy': self.do_destroy,
+            'update': self.do_update,
+            'quit': self.do_quit,
+            'EOF': self.do_EOF,
+            'help': self.do_help
+        }
 
-   
+
     def default(self, line):
-        print ('default(%s)' % line)
-        return cmd.Cmd.default(self, line)
+        try:
+            parts = line.split(".")
+            if len(parts) == 2:
+                class_name, method = parts
+                if method.endswith("()"):
+                    method = method[:-2]
+                class_obj = self.command_mapping.get(method)
+                if class_obj and callable(class_obj):
+                    result = class_obj(class_name)
+                    if result is not None:
+                        print(result)
+                else:
+                    print(f"** Method '{method}' doesn't exist in class '{class_name}' **")
+            else:
+                print("** class name and method missing **")
+        except Exception as e:
+            print(f"Error: {e}")
+    # def do_all(self, args):
+    #     """Print string representations of all instances, or all instances of a specific class"""
+    #     args_list = args.split()
+    #     if args_list:
+    #         class_name = args_list[0]
+    #         if class_name in self.class_names:
+    #             objs = [str(obj) for obj in storage.all().values() if isinstance(obj, self.class_names[class_name])]
+    #             print(objs)
+    #         else:
+    #             print(f"** Class '{class_name}' doesn't exist **")
+    #     else:
+    #         objs = [str(obj) for obj in storage.all().values()]
+    #         print(objs)
+
+
+
     def do_quit(self, args):
         """Exit the program"""
         return True
@@ -37,7 +81,7 @@ class HBNBCommand(cmd.Cmd):
         """Show help message for a specific command or list available commands"""
         super().do_help(arg)
     
-    
+   
 
 
 
@@ -58,14 +102,32 @@ class HBNBCommand(cmd.Cmd):
         else:
             print("** class doesn't exist **")
 
-    
-    def do_show(self, args):
-        """Print the string representation of an instance based on class name and id"""
+    def do_count(self, args):
+        """Count the number of instances of a class"""
         if not args:
             print("** class name missing **")
             return
 
-        
+        class_name = args
+        if class_name in models.__all__:
+            count = storage.count(class_name)
+            print(count)
+        else:
+            print("** class doesn't exist **")
+
+            
+
+
+
+
+
+
+    def do_show(self, args):
+        """Print the string representation of a City instance."""
+        if not args:
+            print("** class name missing **")
+            return
+
         args_list = args.split()
         class_name = args_list[0]
 
@@ -79,7 +141,21 @@ class HBNBCommand(cmd.Cmd):
                 print("** no instance found **")
         else:
             print("** instance id missing **")
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
 
     def do_destroy(self, args):
         """Delete an instance based on class name and id"""
