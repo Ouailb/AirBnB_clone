@@ -10,7 +10,7 @@ from models.city import City
 from models.review import Review
 from models.amenity import Amenity
 from models.place import Place
-
+"""all classes of console"""
 classes = {
     'BaseModel': BaseModel, 
     'User': User,
@@ -206,9 +206,9 @@ class HBNBCommand(cmd.Cmd):
         if not IsValidClass(args, _id=True):
             return
 
-        instance_objs = storage.all()
+        objs = storage.all()
         key = f"{args[0]}.{args[1]}"
-        _instance = instance_objs.get(key, None)
+        _instance = objs.get(key, None)
         if _instance is None:
             print("** no instance found **")
             return
