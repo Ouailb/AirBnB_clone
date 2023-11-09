@@ -1,321 +1,278 @@
-#!/usr/bin/env python3
-import cmd
-import models
+#!/usr/bin/python3
 import re
+import cmd
+import json
 from models import storage
-from datetime import datetime
 from models.base_model import BaseModel
 from models.user import User
-from models.amenity import Amenity
-from models.city import City
-from models.place import Place
-from models.review import Review
 from models.state import State
+from models.city import City
+from models.review import Review
+from models.amenity import Amenity
+from models.place import Place
 
-""""this script uses the cmd module to create a basic shell like simple shell project"""
-class HBNBCommand(cmd.Cmd):
-    intro = 'Muchi muchi\n'
-    prompt = '(hbnb) '
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.command_mapping = {
-            'all': self.do_all,
-            'create': self.do_create,
-            'show': self.do_show,
-            'count':self.do_count,
-            'destroy': self.do_destroy,
-            'update': self.do_update,
+classes = {
+    'BaseModel': BaseModel, 
+    'User': User,
+    'Amenity': Amenity, 
+    'City': City, 
+    'State': State,
+    'Place': Place,
+    'Review': Review
         }
 
+def IsValidClass(args, _id=False):
+    """Runs checks on args to validate classname entry.
+    """
+
+    if len(args) < 1:
+        print("** class name missing **")
+        return False
+    if args[0] not in classes.keys():
+        print("** class doesn't exist **")
+        return False
+    if len(args) < 2 and _id:
+        print("** instance id missing **")
+        return False
+    return True
 
 
-    def default(self, args):
-        if args:
-            splitter = re.split(r"\.", args)
-            if len(splitter) == 2:
-                class_name, part2 = splitter
-                # print("class:", class_name)
-            
-                command = part2.split("(")[0]
-                # print(command)
-                # Extract text between parentheses and remove quotes
-                match = re.search(r'\((["\'])(.*?)\1\)', part2)
-                if match:
-                    id = match.group(2)
-                    # id = str(id)
-                    # print("id :", id)
 
-                    if command in self.command_mapping:
-                        self.command_mapping[command](f"{class_name} {id}")
-                        # print(result)
-                    else:
-                        print(f"** Method '{command}' doesn't exist in class '{class_name}' **")
-                else:
-                    class_obj = self.command_mapping.get(command)
-                    if class_obj and callable(class_obj):
-                        result = class_obj(class_name)
-                        if result is not None:
-                            print(result)
-            else:
-                print("Invalid format. There should be exactly one dot in the input string.")
+def IsValid_attr(args):
+    """Runs checks on args to validate classname attributes and values.
+    """
+    if len(args) < 3:
+        print("** attribute name missing **")
+        return False
+    if len(args) < 4:
+        print("** value missing **")
+        return False
+    return True
+
+
+def is_float(x):
+    """Checks if `x` is float.
+    """
+    try:
+        a = float(x)
+    except (TypeError, ValueError):
+        return False
+    else:
+        return True
+
+
+def is_int(x):
+    """Checks if `x` is int.
+    """
+    try:
+        a = float(x)
+        b = int(a)
+    except (TypeError, ValueError):
+        return False
+    else:
+        return a == b
+
+
+def parse_str(arg):
+    """Parse `arg` to an `int`, `float` or `string`.
+    """
+    parsed = re.sub("\"", "", arg)
+
+    if is_int(parsed):
+        return int(parsed)
+    elif is_float(parsed):
+        return float(parsed)
+    else:
+        return arg
+
+class HBNBCommand(cmd.Cmd):
+    """console"""       
+
+    prompt = "(hbnb) "
+
+
+
+    def precmd(self, line):
+        """Defines instructions to execute before <line> is interpreted.
+        """
+        if not line:
+            return '\n'
+
+        pattern = re.compile(r"(\w+)\.(\w+)\((.*)\)")
+        match_list = pattern.findall(line)
+        # print(match_list)
+        if not match_list:
+            return super().precmd(line)
+
+        match = match_list[0]
+        # print(match)
+        if not match[2]:
+            if match[1] == "count":
+                instance_objs = storage.all()
+                print(len([
+                    counter for _, counter in instance_objs.items()
+                    if type(counter).__name__ == match[0]]))
+                return "\n"
+            return f"{match[1]} {match[0]}"
         else:
-            print("Nothing")
+            args = match[2].split(", ")
+            # print(args)
+            if len(args) == 1:
+                return "{} {} {}".format(
+                    match[1], match[0],
+                    re.sub("[\"\']", "", match[2]))
+            else:
+                match_dict = re.findall(r"{.*}", match[2])
+                if (match_dict):
+                    return "{} {} {} {}".format(
+                        match[1], match[0],
+                        re.sub("[\"\']", "", args[0]),
+                        re.sub("\'", "\"", match_dict[0]))
+                return "{} {} {} {} {}".format(
+                    match[1], match[0],
+                    re.sub("[\"\']", "", args[0]),
+                    re.sub("[\"\']", "", args[1]), args[2])
+
+
+    
+    def do_create(self, arg):
+        """create a new instance.
+        """
+        args = arg.split()
+        if not IsValidClass(args):
+            return
+
+        new_obj = classes[args[0]]()
+        new_obj.save()
+        print(new_obj.id)
+
+ 
+
+    def do_show(self, arg):
+        """Prints the string representation of an instance.
+        """
+        args = arg.split()
+        if not IsValidClass(args, _id=True):
+            return
+
+        instance_objs = storage.all()
+        key = f"{args[0]}.{args[1]}" # args[0] => class.id
+        # print(key)
+        _instance = instance_objs.get(key, None)
+        if _instance is None:
+            print("** no instance found **")
+            return
+        print(_instance)
+
+    def do_destroy(self, arg):
+        """Deletes an instance based on the class name and id.
+        """
+        args = arg.split()
+        if not IsValidClass(args, _id=True):
+            return
+
+        objs = storage.all()
+        key = f"{args[0]}.{args[1]}"
+        # print(key)
+        _instance = objs.get(key, None)
+        if _instance is None:
+            print("** no instance found **")
+            return
+
+        del objs[key]
+        storage.save()
+
+    def do_all(self, arg):
+        """Prints string representation of all instances.
+        """
+        args = arg.split()
+        all_objs = storage.all()
+
+        if len(args) < 1:
+            print(["{}".format(str(v)) for _, v in all_objs.items()])
+            return
+        if args[0] not in classes.keys():
+            print("** class doesn't exist **")
+            return
+        else:
+            print(["{}".format(str(v))
+                  for _, v in all_objs.items() if type(v).__name__ == args[0]])
+            return
+
+    def do_update(self, arg: str):
+        """Updates an instance based on the class name and id.
+        """
+        args = arg.split(maxsplit=3)
+        if not IsValidClass(args, _id=True):
+            return
+
+        instance_objs = storage.all()
+        key = f"{args[0]}.{args[1]}"
+        _instance = instance_objs.get(key, None)
+        if _instance is None:
+            print("** no instance found **")
+            return
+
+        match_dict = re.findall(r"{.*}", arg)
+        if match_dict:
+            payload = None
+            try:
+                payload: dict = json.loads(match_dict[0])
+            except Exception:
+                print("** invalid syntax")
+                return
+            for k, v in payload.items():
+                setattr(_instance, k, v)
+            storage.save()
+            return
+        if not IsValid_attr(args):
+            return
+        first_attr = re.findall(r"^[\"\'](.*?)[\"\']", args[3])
+        if first_attr:
+            setattr(_instance, args[2], first_attr[0])
+        else:
+            value_list = args[3].split()
+            setattr(_instance, args[2], parse_str(value_list[0]))
+        storage.save()
 
 
 
-    # def default(self, args):
-    #     if args:
-    #         splitter = re.split(r"\.", args)
-    #         if len(splitter) == 2:
-    #             class_name, part2 = splitter
-    #             command = part2.split("(")[0]
-    #             match = re.search(r'\((.*?)\)', part2)
-
-    #             if match:
-    #                 id = match.group(1)
-    #                 if "{" in id and "}" in id:
-    #                     id = id.replace("'", '"')
-    #                     self.command_mapping[command](f"{class_name} {id}")
-    #                 else:
-    #                     if "}" in args:
-    #                         # Handle the case where arguments are a dictionary representation
-    #                         self.command_mapping[command](f"{class_name} {id}", args)
-    #                     else:
-    #                         # Handle the old format with separate attributes and values
-    #                         self.command_mapping[command](f"{class_name} {id}", args)
-    #             else:
-    #                 class_obj = self.command_mapping.get(command)
-    #                 if class_obj and callable(class_obj):
-    #                     result = class_obj(class_name)
-    #                     if result is not None:
-    #                         print(result)
-    #         else:
-    #             print("Invalid format. There should be exactly one dot in the input string.")
-    #     else:
-    #         print("Nothing")
 
 
+    def do_help(self, arg):
+        """To get help on a command, type help <topic>.
+        """
+        return super().do_help(arg)
 
+    def do_EOF(self, line):
+        """manage EOF (ctr+d).
+        """
+        print("")
+        return True
 
-
-
-
-    # def default(self, args):
-    #     if args:
-    #         splitter = re.split(r"\.", args)
-    #         if len(splitter) == 2:
-    #             part1, part2 = splitter
-    #             print("class:", part1)
-    #             print("Second Part:", part2)
-    #             print("command",part2.split("(")[0])
-    #             # Extract text between parentheses and remove quotes
-    #             match = re.search(r'\((["\'])(.*?)\1\)', part2)
-    #             if match:
-    #                 id = match.group(2)
-    #                 print("Text between parentheses:",id)
-
-    #             else:
-    #                 print("No text between parentheses found.")
-    #         else:
-    #             print("Invalid format. There should be exactly one dot in the input string.")
-    #     else:
-    #         print("Nothing")
-
-
-    def do_quit(self, args):
-        """Exit the program"""
+    def do_quit(self, arg):
+        """exit the console.
+        """
         return True
 
     def emptyline(self):
-        """last cmd"""
+        """
+        delete the history of last command
+        """
         pass
+
+
+
+
+
+
+
+
+
+
+
+
+
     
-    def do_EOF(self, args):
-        """Exit the program when EOF (Ctrl+D) is entered"""
-        return True
-
-    def do_help(self, arg):
-        """Show help message for a specific command or list available commands"""
-        super().do_help(arg)
-    
-   
-
-
-
-
-    def do_create(self, args):
-        """Create a new instance of BaseModel, save it, and print its id"""
-        if not args:
-            print("** class name missing **")
-            return
-        
-        class_name = args.split()[0]
-        if class_name in globals():
-            obj_class = globals()[class_name]
-            obj = obj_class()
-            obj.save()
-            # print(globals())
-            print(obj.id)
-        else:
-            print("** class doesn't exist **")
-
-    def do_count(self, args):
-        """Count the number of instances of a class"""
-        if not args:
-            print("** class name missing **")
-            return
-
-        class_name = args
-        if class_name in models.__all__:
-            count = storage.count(class_name)
-            print(count)
-        else:
-            print("** class doesn't exist **")
-
-            
-
-
-
-
-
-
-    def do_show(self, args):
-        """Print the string representation of a City instance."""
-        if not args:
-            print("** class name missing **")
-            return
-
-        args_list = args.split()
-        class_name = args_list[0]
-        # print(args_list)
-        # print(class_name)
-
-        if len(args_list) > 1:
-            obj_id = args_list[1]
-            key = f"{class_name}.{obj_id}"
-
-            if key in storage.all():
-                print(storage.all()[key])
-            else:
-                print("** no instance found **")
-        else:
-            print("** instance id missing **")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
-    def do_destroy(self, args):
-        """Delete an instance based on class name and id"""
-        if not args:
-            print("** class name missing **")
-            return
-
-        
-        args_list = args.split()
-        class_name = args_list[0]
-
-        if len(args_list) > 1:
-            obj_id = args_list[1]
-            key = f"{class_name}.{obj_id}"
-
-            if key in storage.all():
-                del storage.all()[key]
-                storage.save()
-            else:
-                print("** no instance found **")
-        else:
-            print("** instance id missing **")
-
-    def do_all(self, args):
-        """Print string representations of all instances, or all instances of a specific class"""
-        
-        args_list = args.split()
-        if len(args_list) > 0:
-            class_name = args_list[0]
-
-            if class_name in models.__all__:
-                objs = [str(obj) for key, obj in storage.all().items() if key.split(".")[0] == class_name]
-            else:
-                print("** class doesn't exist **")
-                return
-        else:
-            objs = [str(obj) for obj in storage.all().values()]
-
-        print(objs)
-     
-
-
-    # def do_update(self, args):
-    #     """Update an instance based on class name and id"""
-    #     if not args:
-    #         print("** class name missing **")
-    #         return
-    #     print(args)
-    #     args = args.replace('"','')
-    #     args = args.replace(',','')
-    #     print(args)
-
-    #     splitter = re.split(r" ", args)
-
-    #     class_name = splitter[0]
-    #     if not class_name:
-    #         print("** class doesn't exist **")
-    #         return
-    #     print(class_name)
-
-    #     arg = splitter[1:]
-    #     print(arg)
-    #     if len(arg) > 1:
-    #         obj_id = arg[0]
-    #         print(obj_id)
-            
-    #         if len(arg) > 2:
-    #             key = f"{class_name}.{obj_id}"
-    #             print(key)
-    #             if key in storage.all():
-    #                 obj = storage.all()[key]
-    #                 print(arg[0])
-    #                 attribute = arg[1]
-    #                 print(attribute)
-    #                 print(arg[2])
-    #                 print(len(arg))
-
-    #                 if len(arg) >= 3:
-    #                     value = arg[2]
-    #                     print(value)
-    #                     try:
-    #                         value = eval(value)
-    #                     except (NameError, SyntaxError):
-    #                         pass
-    #                     print("attribute", attribute)
-    #                     print("obj", obj)
-    #                     print("value",value)
-    #                     setattr(obj, attribute, value)
-    #                     obj.save()
-    #                 else:
-    #                     print("** value missing **")
-    #                     return
-    #             else:
-    #                 print("** no instance found **")
-    #         else:
-    #             print("** attribute name missing **")
-    #             return
-    #     else:
-    #         print("** instance id missing **")
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     HBNBCommand().cmdloop()
