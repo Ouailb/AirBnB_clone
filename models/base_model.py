@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import uuid
 from datetime import datetime
@@ -12,9 +12,9 @@ class BaseModel:
 
     """
         define constructor
-        *args, **kwargs arguments for the constructor
+        *args,**kwargs arguments for the constructor
     """
-    def __init__(self,*args,**kwargs):
+    def __init__(self, *args, **kwargs):
         if kwargs:
             if "__class__" in kwargs:
                 del kwargs["__class__"]
@@ -29,9 +29,7 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            storage.new(self) 
-
-            
+            storage.new(self)
 
     def __str__(self):
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"

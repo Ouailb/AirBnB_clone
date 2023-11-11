@@ -38,11 +38,11 @@ class FileStorage:
             from models.user import User
             return User
         elif class_name == "Amenity":
-            from models.amenity import Amenity 
+            from models.amenity import Amenity
             return Amenity
         elif class_name == "City":
             from models.city import City
-            return City 
+            return City
         elif class_name == "Place":
             from models.place import Place
             return Place
@@ -61,6 +61,7 @@ class FileStorage:
             if key.startswith(class_name + "."):
                 count += 1
         return count
+
     def reload(self):
         """reload the opening json file and get data"""
         try:

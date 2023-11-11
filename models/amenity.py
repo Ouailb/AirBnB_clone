@@ -8,4 +8,4 @@ class Amenity(BaseModel):
         user model
     """
 
-    name=""
+    name = ""

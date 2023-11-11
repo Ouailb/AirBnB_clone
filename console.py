@@ -12,14 +12,15 @@ from models.amenity import Amenity
 from models.place import Place
 """all classes of console"""
 classes = {
-    'BaseModel': BaseModel, 
+    'BaseModel': BaseModel,
     'User': User,
-    'Amenity': Amenity, 
-    'City': City, 
+    'Amenity': Amenity,
+    'City': City,
     'State': State,
     'Place': Place,
     'Review': Review
         }
+
 
 def IsValidClass(args, _id=False):
     """Runs checks on args to validate classname entry.
@@ -35,7 +36,6 @@ def IsValidClass(args, _id=False):
         print("** instance id missing **")
         return False
     return True
-
 
 
 def IsValid_attr(args):
@@ -85,12 +85,11 @@ def parse_str(arg):
     else:
         return arg
 
+
 class HBNBCommand(cmd.Cmd):
-    """console"""       
+    """console"""
 
     prompt = "(hbnb) "
-
-
 
     def precmd(self, line):
         """Defines instructions to execute before <line> is interpreted.
@@ -133,8 +132,6 @@ class HBNBCommand(cmd.Cmd):
                     re.sub("[\"\']", "", args[0]),
                     re.sub("[\"\']", "", args[1]), args[2])
 
-
-    
     def do_create(self, arg):
         """create a new instance.
         """
@@ -146,8 +143,6 @@ class HBNBCommand(cmd.Cmd):
         new_obj.save()
         print(new_obj.id)
 
- 
-
     def do_show(self, arg):
         """Prints the string representation of an instance.
         """
@@ -156,7 +151,7 @@ class HBNBCommand(cmd.Cmd):
             return
 
         instance_objs = storage.all()
-        key = f"{args[0]}.{args[1]}" # args[0] => class.id
+        key = f"{args[0]}.{args[1]}"
         # print(key)
         _instance = instance_objs.get(key, None)
         if _instance is None:
@@ -235,10 +230,6 @@ class HBNBCommand(cmd.Cmd):
             setattr(_instance, args[2], parse_str(value_list[0]))
         storage.save()
 
-
-
-
-
     def do_help(self, arg):
         """To get help on a command, type help <topic>.
         """
@@ -262,17 +253,5 @@ class HBNBCommand(cmd.Cmd):
         pass
 
 
-
-
-
-
-
-
-
-
-
-
-
-    
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
