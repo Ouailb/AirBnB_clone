@@ -10,6 +10,7 @@ from models.city import City
 from models.review import Review
 from models.amenity import Amenity
 from models.place import Place
+
 """all classes of console"""
 classes = {
     'BaseModel': BaseModel,
@@ -133,7 +134,8 @@ class HBNBCommand(cmd.Cmd):
                     re.sub("[\"\']", "", args[1]), args[2])
 
     def do_create(self, arg):
-        """create a new instance.
+        """Usage: create <class>
+        Create a new class instance and print its id.
         """
         args = arg.split()
         if not IsValidClass(args):
@@ -144,7 +146,8 @@ class HBNBCommand(cmd.Cmd):
         print(new_obj.id)
 
     def do_show(self, arg):
-        """Prints the string representation of an instance.
+        """Usage: show <class> <id> or <class>.show(<id>)
+        Display the string representation of a class instance of a given id.
         """
         args = arg.split()
         if not IsValidClass(args, _id=True):
@@ -158,10 +161,19 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
         print(_instance)
+    def do_count(self, arg):
+        """Usage: count <class> or <class>.count()
+        Retrieve the number of instances of a given class."""
+        count = 0
+        for obj in storage.all().values():
+            if arg[0] == obj.__class__.__name__:
+                count += 1
+        print(count)
+
 
     def do_destroy(self, arg):
-        """Deletes an instance based on the class name and id.
-        """
+        """Usage: destroy <class> <id> or <class>.destroy(<id>)
+        Delete a class instance of a given id."""
         args = arg.split()
         if not IsValidClass(args, _id=True):
             return
@@ -178,8 +190,9 @@ class HBNBCommand(cmd.Cmd):
         storage.save()
 
     def do_all(self, arg):
-        """Prints string representation of all instances.
-        """
+        """Usage: all or all <class> or <class>.all()
+        Display string representations of all instances of a given class.
+        If no class is specified, displays all instantiated objects."""
         args = arg.split()
         all_objs = storage.all()
 
@@ -195,8 +208,11 @@ class HBNBCommand(cmd.Cmd):
             return
 
     def do_update(self, arg: str):
-        """Updates an instance based on the class name and id.
-        """
+        """Usage: update <class> <id> <attribute_name> <attribute_value> or
+       <class>.update(<id>, <attribute_name>, <attribute_value>) or
+       <class>.update(<id>, <dictionary>)
+        Update a class instance of a given id by adding or updating
+        a given attribute key/value pair or dictionary."""
         args = arg.split(maxsplit=3)
         if not IsValidClass(args, _id=True):
             return
@@ -236,13 +252,12 @@ class HBNBCommand(cmd.Cmd):
         return super().do_help(arg)
 
     def do_EOF(self, line):
-        """manage EOF (ctr+d).
-        """
+        """EOF signal to exit the program."""
         print("")
         return True
 
     def do_quit(self, arg):
-        """exit the console.
+        """Quit command to exit the program.
         """
         return True
 
