@@ -134,9 +134,7 @@ class HBNBCommand(cmd.Cmd):
                     re.sub("[\"\']", "", args[1]), args[2])
 
     def do_create(self, arg):
-        """Usage: create <class>
-        Create a new class instance and print its id.
-        """
+        """Create a new class instance and print its id."""
         args = arg.split()
         if not IsValidClass(args):
             return
@@ -146,9 +144,7 @@ class HBNBCommand(cmd.Cmd):
         print(new_obj.id)
 
     def do_show(self, arg):
-        """Usage: show <class> <id> or <class>.show(<id>)
-        Display the string representation of a class instance of a given id.
-        """
+        """ Display string representation of an instance"""
         args = arg.split()
         if not IsValidClass(args, _id=True):
             return
@@ -161,19 +157,17 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
             return
         print(_instance)
+
     def do_count(self, arg):
-        """Usage: count <class> or <class>.count()
-        Retrieve the number of instances of a given class."""
+        """ return number of instance in a class"""
         count = 0
         for obj in storage.all().values():
             if arg[0] == obj.__class__.__name__:
                 count += 1
         print(count)
 
-
     def do_destroy(self, arg):
-        """Usage: destroy <class> <id> or <class>.destroy(<id>)
-        Delete a class instance of a given id."""
+        """Delete an instance"""
         args = arg.split()
         if not IsValidClass(args, _id=True):
             return
@@ -190,9 +184,8 @@ class HBNBCommand(cmd.Cmd):
         storage.save()
 
     def do_all(self, arg):
-        """Usage: all or all <class> or <class>.all()
-        Display string representations of all instances of a given class.
-        If no class is specified, displays all instantiated objects."""
+        """Display string representations of all instances of a given class."""
+
         args = arg.split()
         all_objs = storage.all()
 
@@ -208,11 +201,7 @@ class HBNBCommand(cmd.Cmd):
             return
 
     def do_update(self, arg: str):
-        """Usage: update <class> <id> <attribute_name> <attribute_value> or
-       <class>.update(<id>, <attribute_name>, <attribute_value>) or
-       <class>.update(<id>, <dictionary>)
-        Update a class instance of a given id by adding or updating
-        a given attribute key/value pair or dictionary."""
+        """update data of an instance after created"""
         args = arg.split(maxsplit=3)
         if not IsValidClass(args, _id=True):
             return
