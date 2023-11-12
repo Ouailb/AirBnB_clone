@@ -94,7 +94,6 @@ class TestPlace_instantiation(unittest.TestCase):
         self.assertIn("amenity_ids", dir(pl))
         self.assertNotIn("amenity_ids", pl.__dict__)
 
-    
     def test_args_unused(self):
         pl = Place(None)
         self.assertNotIn(None, pl.__dict__.values())
@@ -110,6 +109,7 @@ class TestPlace_instantiation(unittest.TestCase):
     def test_instantiation_with_None_kwargs(self):
         with self.assertRaises(TypeError):
             Place(id=None, created_at=None, updated_at=None)
+
     def test_two_places_unique_ids(self):
         pl1 = Place()
         pl2 = Place()
@@ -138,7 +138,6 @@ class TestPlace_instantiation(unittest.TestCase):
         self.assertIn("'id': '123456'", plstr)
         self.assertIn("'created_at': " + dt_repr, plstr)
         self.assertIn("'updated_at': " + dt_repr, plstr)
-
 
 
 class TestPlace_save(unittest.TestCase):
