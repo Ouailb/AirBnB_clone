@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 """
-The HBNBCommand module provides a command-line interface for interacting 
-with instances of various classes in a hypothetical database system. 
-It allows users to perform CRUD (Create, Read, Update, Delete) operations 
-on instances of classes such as BaseModel, User, Amenity, City, State, Place, and Review.
+The HBNBCommand module provides a command-line interface for interacting
+with instances of various classes in a hypothetical database system.
+It allows users to perform CRUD (Create, Read, Update, Delete) operations
+on instances of classes such as
+BaseModel, User, Amenity, City, State, Place, and Review.
 """
 import re
 import cmd
