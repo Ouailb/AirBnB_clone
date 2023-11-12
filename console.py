@@ -134,7 +134,8 @@ class HBNBCommand(cmd.Cmd):
                     re.sub("[\"\']", "", args[1]), args[2])
 
     def do_create(self, arg):
-        """Create a new class instance and print its id."""
+        """Create a new class instance and print its id.
+        """
         args = arg.split()
         if not IsValidClass(args):
             return
@@ -144,7 +145,8 @@ class HBNBCommand(cmd.Cmd):
         print(new_obj.id)
 
     def do_show(self, arg):
-        """ Display string representation of an instance"""
+        """ Display string representation of an instance
+        """
         args = arg.split()
         if not IsValidClass(args, _id=True):
             return
@@ -159,7 +161,8 @@ class HBNBCommand(cmd.Cmd):
         print(_instance)
 
     def do_count(self, arg):
-        """ return number of instance in a class"""
+        """return number of instance in a class
+        """
         count = 0
         for obj in storage.all().values():
             if arg[0] == obj.__class__.__name__:
@@ -167,7 +170,8 @@ class HBNBCommand(cmd.Cmd):
         print(count)
 
     def do_destroy(self, arg):
-        """Delete an instance"""
+        """Delete an instance
+        """
         args = arg.split()
         if not IsValidClass(args, _id=True):
             return
@@ -184,7 +188,8 @@ class HBNBCommand(cmd.Cmd):
         storage.save()
 
     def do_all(self, arg):
-        """Display string representations of all instances of a given class."""
+        """Display string representations of all instances of a given class.
+        """
 
         args = arg.split()
         all_objs = storage.all()
@@ -201,7 +206,8 @@ class HBNBCommand(cmd.Cmd):
             return
 
     def do_update(self, arg: str):
-        """update data of an instance after created"""
+        """update data of an instance after created
+        """
         args = arg.split(maxsplit=3)
         if not IsValidClass(args, _id=True):
             return
@@ -241,7 +247,8 @@ class HBNBCommand(cmd.Cmd):
         return super().do_help(arg)
 
     def do_EOF(self, line):
-        """EOF signal to exit the program."""
+        """EOF signal to exit the program.
+        """
         print("")
         return True
 
