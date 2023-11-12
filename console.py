@@ -1,4 +1,10 @@
 #!/usr/bin/python3
+"""
+The HBNBCommand module provides a command-line interface for interacting 
+with instances of various classes in a hypothetical database system. 
+It allows users to perform CRUD (Create, Read, Update, Delete) operations 
+on instances of classes such as BaseModel, User, Amenity, City, State, Place, and Review.
+"""
 import re
 import cmd
 import json
@@ -11,7 +17,6 @@ from models.review import Review
 from models.amenity import Amenity
 from models.place import Place
 
-"""all classes of console"""
 classes = {
     'BaseModel': BaseModel,
     'User': User,
@@ -88,7 +93,8 @@ def parse_str(arg):
 
 
 class HBNBCommand(cmd.Cmd):
-    """console"""
+    """define base class of console
+    """
 
     prompt = "(hbnb) "
 
@@ -145,7 +151,7 @@ class HBNBCommand(cmd.Cmd):
         print(new_obj.id)
 
     def do_show(self, arg):
-        """ Display string representation of an instance
+        """Display string representation of an instance
         """
         args = arg.split()
         if not IsValidClass(args, _id=True):
