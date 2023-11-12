@@ -74,7 +74,7 @@ def is_int(x):
 
 
 def parse_str(arg):
-    """Parse `arg` to an `int`, `float` or `string`.
+    """Parse arguments
     """
     parsed = re.sub("\"", "", arg)
 
