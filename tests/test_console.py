@@ -48,48 +48,50 @@ class TestConsole(unittest.TestCase):
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd("? create")
             self.assertIsInstance(f.getvalue(), str)
-            self.assertEqual(f.getvalue().strip(), "Create a new class instance and print its id.")
+            self.assertEqual(f.getvalue().strip(),
+                             "Create a new class instance and print its id.")
 
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd("help create")
             self.assertIsInstance(f.getvalue(), str)
-            self.assertEqual(f.getvalue().strip(), "Create a new class instance and print its id.")
+            self.assertEqual(f.getvalue().strip(),
+                             "Create a new class instance and print its id.")
 
         with patch('sys.stdout', new=StringIO()) as f:
+            ts = "Display string representations of all instances of a class."
             HBNBCommand().onecmd("? all")
             self.assertIsInstance(f.getvalue(), str)
-            self.assertEqual(f.getvalue().strip(),
-                             "Display string representations of all instances of a given class.")
+            self.assertEqual(f.getvalue().strip(), ts)
 
         with patch('sys.stdout', new=StringIO()) as f:
+            ts = "Display string representations of all instances of a class."
             HBNBCommand().onecmd("help all")
             self.assertIsInstance(f.getvalue(), str)
-            self.assertEqual(f.getvalue().strip(),
-                             "Display string representations of all instances of a given class.")
+            self.assertEqual(f.getvalue().strip(), ts)
 
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd("? show")
             self.assertIsInstance(f.getvalue(), str)
             self.assertEqual(f.getvalue().strip(),
-                              "Display string representation of an instance")
+                             "Display string representation of an instance")
 
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd("help show")
             self.assertIsInstance(f.getvalue(), str)
             self.assertEqual(f.getvalue().strip(),
-                              "Display string representation of an instance")
+                             "Display string representation of an instance")
 
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd("? update")
             self.assertIsInstance(f.getvalue(), str)
             self.assertEqual(f.getvalue().strip(),
-                                "update data of an instance after created")
+                             "update data of an instance after created")
 
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd("help update")
             self.assertIsInstance(f.getvalue(), str)
             self.assertEqual(f.getvalue().strip(),
-                               "update data of an instance after created")
+                             "update data of an instance after created")
 
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd("? destroy")

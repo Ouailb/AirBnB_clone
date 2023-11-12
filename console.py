@@ -188,7 +188,7 @@ class HBNBCommand(cmd.Cmd):
         storage.save()
 
     def do_all(self, arg):
-        """Display string representations of all instances of a given class.
+        """Display string representations of all instances of a class.
         """
 
         args = arg.split()
